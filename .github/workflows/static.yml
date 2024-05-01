@@ -26,7 +26,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: build result json
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build result json
         run: |
          chmod +x ./traverse_directory.sh
          ./traverse_directory.sh

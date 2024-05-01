@@ -16,9 +16,8 @@ function traverse_directory() {
       # 提取文件名、最后修改日期和字数
       local filename="${file##*/}"
       local modified_date=$(date -r "${file}" +%Y-%m-%d\ %H:%M:%S)
-      local word_count=$(wc -w < "${file}")
       # 添加到文件数组
-      files+=("{ \"relative_path\": \"${directory}\", \"filename\": \"${filename}\", \"modified_date\": \"${modified_date}\", \"word_count\": ${word_count} }")
+      files+=("{ \"relative_path\": \"${directory}\", \"filename\": \"${filename}\", \"modified_date\": \"${modified_date}\" }")
     fi
   done
 

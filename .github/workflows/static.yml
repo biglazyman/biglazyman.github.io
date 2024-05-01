@@ -21,18 +21,7 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-jobs:
-  # generate directory_info.json
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build result json
-        run: |
-         chmod +x ./traverse_directory.sh
-         ./traverse_directory.sh
-        shell: bash
+jobs:     
   # deploy
   deploy:
     environment:
@@ -44,6 +33,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Build result json
+        run: |
+         chmod +x ./traverse_directory.sh
+         ./traverse_directory.sh
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

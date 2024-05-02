@@ -31,13 +31,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Restore Timestamps
+        uses: chetan/git-restore-mtime-action@v1
       - name: Build result json
         run: |
          chmod +x ./traverse_directory.sh
          ./traverse_directory.sh
         shell: bash
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -44,21 +44,33 @@
         }
 
         .article_header {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 400;
             color: #333;
             height: 30px;
+            line-height: 30px;
             padding: 10px;
             border-bottom: 2px solid #000;
             font-style: italic;
             background-color: #fff;
         }
 
-        .article_title {
+        .article_header .breadcrumb-separator{
+            font-weight: 900;
+            font-size: 20px;
+            color: #888;
+        }
+
+        .article_header span:last-child .breadcrumb-link {
             font-size: 22px;
             font-weight: bold;
             font-style: normal;
+            text-decoration: none;
             color: #000;
+            pointer-events: none;
+            cursor: default;
+            text-decoration: none;
+            margin-left: 5px;
         }
 
         .article_main {
@@ -114,22 +126,21 @@
             id="article_list">
             <template x-for="(article_item,index) in artilce_list"">
                 <div class=" article_item">
-                <nav class="article_header" x-data="{ menu: article_item.relative_path.replace('./','').split('/')}">
+                <nav class="article_header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
                     <template x-for="(menu_item,menu_index) in menu">
                         <span>
+                            <span class="breadcrumb-separator">/</span>
                             <a class="breadcrumb-link" :href="menu.slice(0,menu_index+1).join('/')"
                                 x-text="menu_item"></a>
-                            <span class="breadcrumb-separator">/</span>
                         </span>
                     </template>
-                    <span class="article_title" x-text="article_item.filename"></span>
                 </nav>
                 <div class="article_main" x-data="{ isOverflown: false}">
                     <div class="article_content" x-html="(async function(){
-                            const result = marked.parse(await (await fetch(article_item.relative_path+'/'+article_item.filename)).text());
+                            const result = marked.parse(await (await fetch(article_item.filepath)).text());
                             $nextTick(()=>{
                                 isOverflown = elementIsOverflown($el);
-                                article_item.word_count = $el.textContent.split(/[\u00ff-\uffff]|\S+/g).length;
+                                article_item.word_count = $el.textContent.split(/[\u00ff-\uffff]|\S+/g).length-1;
                             })
                             return result;
                         })()">
@@ -138,7 +149,7 @@
                 </div>
                 <div class="article_footer">
                     <span x-text="'字数: '+ article_item.word_count"></span>
-                    <span x-text="'最后修改时间: ' + article_item.modified_date"></span>
+                    <span x-text="'最后修改时间: ' + article_item.last_modified"></span>
                 </div>
         </div>
         </template>

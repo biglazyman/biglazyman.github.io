@@ -39,7 +39,7 @@ jobs:
           timezoneWindows: "Singapore Standard Time"
       # Fix timestamps
       - name: restore timestamps
-        uses: chetan/git-restore-mtime-action@v2
+        uses: harshmandan/git-restore-mtime-action@v10
       - name: Build result json
         run: |
          chmod +x ./traverse_directory.sh

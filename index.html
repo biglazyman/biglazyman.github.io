@@ -5,6 +5,7 @@
     <title>BigLazyMan's Blog</title>
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="markdown.css">
     <style>
         html {
             margin: 0;
@@ -23,7 +24,7 @@
             height: 100%;
         }
 
-        #article_list {
+        #article-list {
             display: flex;
             justify-content: center;
             flex-direction: column;
@@ -31,7 +32,7 @@
             width: 100%;
         }
 
-        .article_item {
+        .article-item {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -43,7 +44,7 @@
             background-color: #fff;
         }
 
-        .article_header {
+        .article-header {
             font-size: 16px;
             font-weight: 400;
             color: #333;
@@ -53,32 +54,42 @@
             border-bottom: 2px solid #000;
             font-style: italic;
             background-color: #fff;
+            position: relative;
         }
 
-        .article_header .breadcrumb-separator{
+        .article-header .breadcrumb .breadcrumb-link {
+            pointer-events: none;
+            text-decoration: none;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .article-header .article-title .breadcrumb-link {
+            font-size: 25px;
+            font-weight: 600;
+            color: blue;
+        }
+
+        .article-header .last-modify-date {
+            position: absolute;
+            right: 5px;
+            font-size: 12px;
+            color: #888;
+            display: inline;
+            pointer-events: none;
+        }
+
+        .article-header .breadcrumb-separator {
             font-weight: 900;
             font-size: 20px;
             color: #888;
         }
 
-        .article_header span:last-child .breadcrumb-link {
-            font-size: 22px;
-            font-weight: bold;
-            font-style: normal;
-            text-decoration: none;
-            color: #000;
-            pointer-events: none;
-            cursor: default;
-            text-decoration: none;
-            margin-left: 5px;
-        }
-
-        .article_main {
+        .article-main {
             position: relative;
-            background-color: #fff;
         }
 
-        .article_content {
+        .article-content {
             padding: 10px;
             color: #000;
             height: 300px;
@@ -86,18 +97,7 @@
             overflow: hidden;
         }
 
-        .article_footer {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            font-size: 12px;
-            color: #888;
-            background-color: #fff;
-        }
-
-        .read_more {
+        .read-more {
             display: block;
             position: absolute;
             bottom: 0px;
@@ -112,7 +112,7 @@
             color: #000;
         }
 
-        .read_more:hover {
+        .read-more:hover {
             background: #dcdcdc;
             text-decoration: underline;
         }
@@ -122,35 +122,40 @@
 <body>
     <header>BigLazyMan's Blog</header>
     <main>
-        <div x-data="{ artilce_list: [] }" x-init="artilce_list = await (await fetch('./directory_info.json')).json()"
-            id="article_list">
-            <template x-for="(article_item,index) in artilce_list"">
-                <div class=" article_item">
-                <nav class="article_header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
-                    <template x-for="(menu_item,menu_index) in menu">
-                        <span>
+        <div id="article-list" x-data="{ article_list: [], }"
+            x-init="article_list = await (await fetch('./directory_info.json')).json() ">
+            <template x-for="(article_item,index) in article_list"">
+                <div class=" article-item">
+                <nav class="article-header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
+                    <template x-for="(menu_item,menu_index) in menu.slice(0,menu.length-1)">
+                        <span class="breadcrumb">
                             <span class="breadcrumb-separator">/</span>
                             <a class="breadcrumb-link" :href="menu.slice(0,menu_index+1).join('/')"
                                 x-text="menu_item"></a>
                         </span>
                     </template>
+                    <span class="article-title">
+                        <span class="breadcrumb-separator">/</span>
+                        <a class="breadcrumb-link" href="javascript:void(0);"
+                            @click="article_item.show=!article_item.show" 
+                            x-text="menu[menu.length-1]+(article_item.show?'(收起)':'(阅读)')"></a>
+                    </span>
+                    <span class="last-modify-date" x-text="'最后修改时间: ' + article_item.last_modified"></span>
                 </nav>
-                <div class="article_main" x-data="{ isOverflown: false}">
-                    <div class="article_content" x-html="(async function(){
-                            const result = marked.parse(await (await fetch(article_item.filepath)).text());
-                            $nextTick(()=>{
-                                isOverflown = elementIsOverflown($el);
-                                article_item.word_count = $el.textContent.split(/[\u00ff-\uffff]|\S+/g).length-1;
-                            })
-                            return result;
-                        })()">
+                <template x-if="article_item.show">
+                    <div class="article-main" x-data="{ isOverflown: false}">
+                        <div class="article-content" x-html="(async function(){
+                                const result = marked.parse(await (await fetch(article_item.filepath)).text());
+                                $nextTick(()=>{
+                                    isOverflown = elementIsOverflown($el);
+                                    article_item.word_count = $el.textContent.split(/[\u00ff-\uffff]|\S+/g).length-1;
+                                })
+                                return result;
+                            })()">
+                        </div>
+                        <button class="read-more" @click="toggleReadMore($el)" x-show="isOverflown">阅读全文</button>
                     </div>
-                    <button class="read_more" @click="toggleReadMore($el)" x-show="isOverflown">阅读全文</button>
-                </div>
-                <div class="article_footer">
-                    <span x-text="'字数: '+ article_item.word_count"></span>
-                    <span x-text="'最后修改时间: ' + article_item.last_modified"></span>
-                </div>
+                </template>
         </div>
         </template>
         </div>

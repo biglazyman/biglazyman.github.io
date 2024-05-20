@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" >
+<html lang="zh">
 
 <head>
     <title>BigLazyMan's Blog</title>
@@ -8,54 +8,94 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" type="text/css" href="markdown.css">
     <style>
-        html {
+        html,
+        body {
             margin: 0;
             padding: 0;
         }
 
         header {
-            height: 40px;
-            font-size: 30px;
+            position: sticky;
+            height: 30px;
+            top: 0;
+            width: 100%;
+            line-height: 30px;
+            font-size: 25px;
             text-align: center;
+            font-weight: bold;
+            border: none;
             padding: 20px 0;
+            background: #fff;
             color: #000;
+            z-index: 999;
         }
 
         main {
-            height: 100%;
+            position: relative;
+            /* top: 70px; */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
         }
 
-        #article-list {
+
+        .article-list {
             display: flex;
             justify-content: center;
             flex-direction: column;
             align-items: center;
-            width: 100%;
         }
 
         .article-item {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: stretch;
             border: 2px solid #000;
+            border-top: none;
             border-radius: 0;
-            width: 90%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             background-color: #fff;
+            width: 100%;
+        }
+
+        @media screen and (min-width: 1100px) {
+            .article-list {
+                width: 60%;
+            }
+        }
+
+        @media screen and (max-width: 1100px) {
+            .article-list {
+                width: 90%;
+            }
+
+            .toc {
+                display: none;
+            }
+
+            .notes {
+                display: none;
+            }
         }
 
         .article-header {
-            font-size: 16px;
+            position: sticky;
+            top: 70px;
             font-weight: 400;
+            font-size: 16px;
             color: #333;
             height: 30px;
             line-height: 30px;
             padding: 10px;
-            border-bottom: 2px solid #000;
+            border-top: 2px solid #000;
+            border-bottom: 1px solid #000;
             font-style: italic;
             background-color: #fff;
-            position: relative;
+            z-index: 1;
         }
 
         .article-header .breadcrumb .breadcrumb-link {
@@ -93,29 +133,47 @@
         .article-content {
             padding: 10px;
             color: #000;
-            height: 300px;
-            max-height: 300px;
-            overflow: hidden;
         }
 
-        .read-more {
-            display: block;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100px;
-            height: 40px;
-            margin: auto auto 5px auto;
+        #toc {
+            position: sticky;
+            top: 70px;
             border: 2px solid #000;
-            font-size: 1rem;
-            background: #fff;
-            color: #000;
+            align-items: flex-start;
+            width: 15%;
+            order: -1;
+            min-height: 300px;
+            margin-right: 40px;
+            max-height: 700px;
+            overflow: overlay;
+            padding: 10px;
+            visibility: hidden;
         }
 
-        .read-more:hover {
-            background: #dcdcdc;
-            text-decoration: underline;
+        #toc ul {
+            margin-top: 5px;
+            margin-left: -20px;
+        }
+
+        #toc li {
+            margin-top: 10px;
+        }
+
+        #toc a {
+            font-size: 14px;
+        }
+
+        h1::before,
+        h2::before,
+        h3::before,
+        h4::before,
+        h5::before,
+        h6::before {
+            content: '';
+            display: block;
+            height: 135px;
+            margin-top: -135px;
+            visibility: hidden;
         }
     </style>
 </head>
@@ -123,63 +181,105 @@
 <body>
     <header>BigLazyMan's Blog</header>
     <main>
-        <div id="article-list" x-data="{ article_list: [] }"
+        <div class="article-list" x-data="{ article_list: [] }"
             x-init="article_list = await (await fetch('./directory_info.json')).json()">
-            <template x-for="(article_item, index) in article_list">
+            <template x-for="(article_item,index) in article_list">
                 <div class="article-item">
-                <nav class="article-header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
-                    <template x-for="(menu_item,menu_index) in menu.slice(0,menu.length-1)">
-                        <span class="breadcrumb">
+                    <nav class="article-header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
+                        <template x-for="(menu_item,menu_index) in menu.slice(0,menu.length-1)">
+                            <span class="breadcrumb">
+                                <span class="breadcrumb-separator">/</span>
+                                <a class="breadcrumb-link" :href="menu.slice(0,menu_index+1).join('/')"
+                                    x-text="menu_item"></a>
+                            </span>
+                        </template>
+                        <span class="article-title">
                             <span class="breadcrumb-separator">/</span>
-                            <a class="breadcrumb-link" :href="menu.slice(0,menu_index+1).join('/')"
-                                x-text="menu_item"></a>
+                            <a class="breadcrumb-link" href="javascript:void(0);" @click="toggleRead($data,index)"
+                                x-text="menu[menu.length-1]+(article_item.show?'  (收起)':'  (阅读)')"></a>
                         </span>
-                    </template>
-                    <span class="article-title">
-                        <span class="breadcrumb-separator">/</span>
-                        <a class="breadcrumb-link" href="javascript:void(0);"
-                            @click="article_item.show=!article_item.show" 
-                            x-text="menu[menu.length-1]+(article_item.show?'  (收起)':'  (阅读)')"></a>
-                    </span>
-                    <span class="last-modify-date" x-text="'最后修改时间: ' + article_item.last_modified"></span>
-                </nav>
-                <template x-if="article_item.show">
-                    <div class="article-main" x-data="{ isOverflown: false}">
-                        <div class="article-content" x-html="(async function(){
+                        <span class="last-modify-date" x-text="'最后修改时间: ' + article_item.last_modified"></span>
+                    </nav>
+                    <template x-if="article_item.show">
+                        <div class="article-main">
+                            <div class="article-content" x-html="(async function(){
                                 const result = marked.parse(await (await fetch(article_item.filepath)).text());
                                 $nextTick(()=>{
-                                    isOverflown = elementIsOverflown($el);
-                                    article_item.word_count = $el.textContent.split(/[\u00ff-\uffff]|\S+/g).length-1;
+                                    showToc(index);
                                 })
                                 return result;
                             })()">
+                            </div>
                         </div>
-                        <button class="read-more" @click="toggleReadMore($el)" x-show="isOverflown">阅读全文</button>
-                    </div>
-                </template>
+                    </template>
+                </div>
+            </template>
         </div>
-        </template>
+
+        <div id="toc">
         </div>
     </main>
     <script>
-        function elementIsOverflown(element) {
-            return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+        function toggleRead({ article_list }, index) {
+            if (article_list[index].show) {
+                article_list[index].show = false;
+                hideToc(index);
+            } else {
+                article_list[index].show = true;
+            }
         }
 
-        function toggleReadMore(button) {
-            const contentDiv = button.previousElementSibling;
-            if (elementIsOverflown(contentDiv)) {
-                contentDiv.style.height = 'fit-content';
-                contentDiv.style.maxHeight = 'fit-content';
-                contentDiv.style.overflow = 'none';
-                contentDiv.style.paddingBottom = '50px';
-                button.innerHTML = '收起全文';
-            } else {
-                contentDiv.style.height = '300px';
-                contentDiv.style.maxHeight = '300px';
-                contentDiv.style.overflow = 'overflow';
-                button.innerHTML = '阅读全文';
+
+        function showToc(focus_index) {
+            let selector = `.article-item:nth-of-type(${focus_index + 1}) .article-content `;
+            let header_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+            //collect all headers
+            let header_list = [];
+            for (let header_tag of header_tags) {
+                let tag_nodes = document.querySelectorAll(selector + header_tag);
+                header_list.push(...tag_nodes);
             }
+
+            //sort
+            header_list.sort((first, next) => {
+                return first.offsetTop - next.offsetTop;
+            })
+
+            //create node
+            let tocEl = document.getElementById('toc');
+            tocEl.style.visibility = 'visible';
+            let level_map = { 'H1': 1, 'H2': 2, 'H3': 3, 'H4': 4, 'H5': 5, 'H6': 6 };
+            let parent_node = tocEl;
+            let current_level = 0;
+            for (let i = 0; i < header_list.length; i++) {
+                let header = header_list[i];
+                let header_level = level_map[header.tagName];
+                if (current_level < header_level) {
+                    let _ul = document.createElement('ul');
+                    parent_node.appendChild(_ul);
+                    current_level = header_level;
+                    parent_node = _ul;
+                } else if (current_level > header_level) {
+                    current_level = header_level;
+                    parent_node = parent_node.parentNode;
+                }
+
+                let anchor_id = current_level + '-' + header.innerText;
+                header.setAttribute('id', anchor_id);
+                let _li = document.createElement('li');
+                let _a = document.createElement('a');
+                _a.setAttribute('href', '#' + anchor_id);
+                _a.innerText = header.innerText;
+                _li.appendChild(_a);
+                parent_node.appendChild(_li);
+            }
+        }
+
+        function hideToc(focus_index) {
+            let tocEl = document.getElementById('toc');
+            tocEl.style.visibility = 'hidden';
+            tocEl.innerHTML = '';
         }
     </script>
 </body>

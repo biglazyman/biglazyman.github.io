@@ -287,6 +287,9 @@
             if (!tocEl.hasChildNodes()) {
                 tocEl.style.visibility = 'hidden';
                 tocEl.innerHTML = '';
+
+                //remove hash
+                location.hash = '';
             }
         }
     </script>

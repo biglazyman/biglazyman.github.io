@@ -7,12 +7,17 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" type="text/css" href="markdown.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css" />
     <style>
+        :root{
+            --zoom-rate: 1.2;
+        }
+        
         html,
         body {
             margin: 0;
             padding: 0;
-            font-family: "Microsoft Yahei", sans-serif;
+            font-family: "LXGW WenKai", "Microsoft Yahei", sans-serif;
         }
 
         header {
@@ -22,6 +27,7 @@
             width: 100%;
             line-height: 30px;
             font-size: 25px;
+            cursor: pointer;
             text-align: center;
             font-weight: bold;
             border: none;
@@ -114,6 +120,7 @@
         .article-content {
             padding: 10px;
             color: #000;
+            zoom: var(--zoom-rate);
         }
 
         #toc {
@@ -126,7 +133,7 @@
             min-height: 300px;
             margin-right: 40px;
             height: fit-content;
-            max-height: 700px;
+            max-height: 800px;
             overflow: overlay;
             padding: 10px;
             visibility: hidden;
@@ -142,7 +149,7 @@
         }
 
         #toc a {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         h1::before,
@@ -153,8 +160,8 @@
         h6::before {
             content: '';
             display: block;
-            height: 135px;
-            margin-top: -135px;
+            height: calc(135px / var(--zoom-rate));
+            margin-top: calc(-135px / var(--zoom-rate));
             visibility: hidden;
         }
 

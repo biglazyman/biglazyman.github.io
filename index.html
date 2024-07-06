@@ -4,15 +4,19 @@
 <head>
     <title>BigLazyMan's Blog</title>
     <meta charset="UTF-8">
+
     <script src="//unpkg.com/alpinejs" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="markdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css" />
+    <script nomodule defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.js"
+        integrity="sha384-z9arB7KJHppq8kK9AESncXcQd/KXIMMPiCrAdxfFpp+5QU438lgBE7UFGbk+gljP"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.css"
+        integrity="sha384-NFTC4wvyQKLwuJ8Ez9AvPNBv8zcC2XaQzXSMvtORKw28BdJbB2QE8Ka+OyrIHcQJ" crossorigin="anonymous">
     <style>
-        :root{
+        :root {
             --zoom-rate: 1.2;
         }
-        
+
         html,
         body {
             margin: 0;
@@ -225,7 +229,70 @@
 
         <div id="toc"></div>
     </main>
-    <script>
+    <script type="module">
+        import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+        import katex from 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.mjs';
+
+        window.marked = marked;
+
+        const marked_katex_inline = {
+            name: 'marked-katex-inline',
+            level: 'inline',
+            start(src) {
+                return src.match(/\$|\\\(/)?.index;
+            },
+            tokenizer(src, tokens) {
+                const rule = /^(?:\$|\\\()([^\$\n]+?)(?:\$|\\\))/;
+                const match = rule.exec(src);
+                if (match) {
+                    return {
+                        type: 'marked-katex-inline',
+                        raw: match[0],
+                        text: match[1].trim()
+                    };
+                }
+            },
+            renderer(token) {
+                return katex.renderToString(token.text, {
+                    throwOnError: false,
+                    displayMode: false
+                });;
+            }
+        }
+
+        const marked_katex_block = {
+            name: 'marked-katex-block',
+            level: 'block',
+            start(src) {
+                return src.match(/\$\$|\\\[/)?.index;
+            },
+            tokenizer(src, tokens) {
+                const rule = /^(?:\$\$|\\\[)([^\$\n]+?)(?:\$\$|\\\])/;
+                const match = rule.exec(src);
+                if (match) {
+                    return {
+                        type: 'marked-katex-block',
+                        raw: match[0],
+                        text: match[1].trim()
+                    };
+                }
+            },
+            renderer(token) {
+                return katex.renderToString(token.text, {
+                    throwOnError: false,
+                    displayMode: true
+                });;
+            }
+        }
+
+        window.marked.use({
+            extensions: [
+                marked_katex_inline,
+                marked_katex_block
+            ]
+        })
+    </script>
+    <script type="text/javascript">
         function toggleRead({ article_list }, index) {
             if (article_list[index].show) {
                 article_list[index].show = false;

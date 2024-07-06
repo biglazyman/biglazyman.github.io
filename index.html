@@ -242,7 +242,8 @@
                 return src.match(/\$|\\\(/)?.index;
             },
             tokenizer(src, tokens) {
-                const rule = /^(?:\$|\\\()([^\$\n]+?)(?:\$|\\\))/;
+                const rule = /^(?:\$|\\\()(.*?)(?:\$|\\\))/gs;
+                // const rule = /\\\((.*?)\\\)|\$(.*?)\$/;
                 const match = rule.exec(src);
                 if (match) {
                     return {
@@ -267,7 +268,8 @@
                 return src.match(/\$\$|\\\[/)?.index;
             },
             tokenizer(src, tokens) {
-                const rule = /^(?:\$\$|\\\[)([^\$\n]+?)(?:\$\$|\\\])/;
+                const rule = /^(?:\$\$|\\\[)(.*?)(?:\$\$|\\\])/gs;
+                // const rule = /\\\[(.*?)\\\]|\$\$(.*?)\$\$/;
                 const match = rule.exec(src);
                 if (match) {
                     return {

@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
 
     <script src="//unpkg.com/alpinejs" defer></script>
+    <link rel="stylesheet" href="./markdown.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css" />
     <script nomodule defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.js"
         integrity="sha384-z9arB7KJHppq8kK9AESncXcQd/KXIMMPiCrAdxfFpp+5QU438lgBE7UFGbk+gljP"
@@ -300,7 +301,7 @@
             image(href, title, text) {
                 // source code from "https://github.com/markedjs/marked/blob/a1982aa547998c32567146c73a3c291bf4922c45/src/Renderer.ts#L194"
                 let cleanHref = null;
-                
+
                 try {
                     cleanHref = encodeURI(href).replace(/%25/g, '%');
                 } catch (e) {
@@ -316,7 +317,6 @@
                 // add referrerpolicy ="never" here
                 out += ' referrerpolicy ="never" '
                 out += '>';
-                console.log('image tag html:', out);
                 return out;
             }
         }

@@ -235,6 +235,7 @@
 
         window.marked = marked;
 
+        // support for katex
         const marked_katex_inline = {
             name: 'marked-katex-inline',
             level: 'inline',
@@ -293,6 +294,33 @@
                 marked_katex_block
             ]
         })
+
+        // suport for image 403 add referrerpolicy ="never" attribute
+        const renderer = {
+            image(href, title, text) {
+                // source code from "https://github.com/markedjs/marked/blob/a1982aa547998c32567146c73a3c291bf4922c45/src/Renderer.ts#L194"
+                let cleanHref = null;
+                
+                try {
+                    cleanHref = encodeURI(href).replace(/%25/g, '%');
+                } catch (e) {
+                    cleanHref = text;
+                }
+
+                href = cleanHref;
+
+                let out = `<img src="${href}" alt="${text}"`;
+                if (title) {
+                    out += ` title="${title}"`;
+                }
+                // add referrerpolicy ="never" here
+                out += ' referrerpolicy ="never" '
+                out += '>';
+                console.log('image tag html:', out);
+                return out;
+            }
+        }
+        window.marked.use({ renderer });
     </script>
     <script type="text/javascript">
         function toggleRead({ article_list }, index) {

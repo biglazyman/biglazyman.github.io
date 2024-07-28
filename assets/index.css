@@ -6,21 +6,21 @@ html,
 body {
     margin: 0;
     padding: 0;
-    font-family: "LXGW WenKai", "Microsoft Yahei", sans-serif;
+    font-family: "LXGW WenKai", "Intel", sans-serif;
 }
 
 header {
     position: sticky;
-    height: 30px;
+    height: 32px;
     top: 0;
     width: 100%;
-    line-height: 30px;
-    font-size: 25px;
+    line-height: 32px;
+    font-size: 24px;
     cursor: pointer;
     text-align: center;
     font-weight: bold;
     border: none;
-    padding: 20px 0;
+    padding: 24px 0;
     background: #fff;
     color: #000;
     z-index: 999;
@@ -28,7 +28,6 @@ header {
 
 main {
     position: relative;
-    /* top: 70px; */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -49,24 +48,24 @@ main {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    border: 2px solid #000;
+    border: 1px solid #000;
     border-top: none;
     border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     background-color: #fff;
     width: 100%;
 }
 
 .article-header {
     position: sticky;
-    top: 70px;
+    top: 80px;
     font-weight: 400;
+    width: auto;
     font-size: 16px;
     color: #333;
-    height: 30px;
-    line-height: 30px;
-    padding: 10px;
+    height: 32px;
+    line-height: 32px;
+    padding: 12px;
     border-top: 2px solid #000;
     border-bottom: 1px solid #000;
     font-style: italic;
@@ -82,14 +81,14 @@ main {
 }
 
 .article-header .article-title .breadcrumb-link {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 600;
     color: blue;
 }
 
 .article-header .last-modify-date {
     position: absolute;
-    right: 5px;
+    right: 8px;
     font-size: 12px;
     color: #888;
     display: inline;
@@ -98,7 +97,7 @@ main {
 
 .article-header .breadcrumb-separator {
     font-weight: 900;
-    font-size: 20px;
+    font-size: 24px;
     color: #888;
 }
 
@@ -107,66 +106,131 @@ main {
 }
 
 .article-content {
-    padding: 10px;
+    padding: 8px;
     color: #000;
     zoom: var(--zoom-rate);
 }
 
 #toc {
     position: sticky;
-    top: 70px;
+    top: 80px;
     border: 2px groove #000;
     align-items: flex-start;
-    width: 15%;
+    width: 264px;
     order: -1;
-    min-height: 300px;
-    margin-right: 40px;
+    min-height: 320px;
+    margin-right: 48px;
     height: fit-content;
-    max-height: 800px;
+    max-height: 720px;
     overflow: overlay;
-    padding: 10px;
+    padding: 8px;
     visibility: hidden;
 }
 
 #toc ul {
-    margin-top: 5px;
+    margin-top: 4px;
     margin-left: -20px;
 }
 
 #toc li {
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 #toc a {
     font-size: 16px;
 }
 
-h1::before,
-h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
+.article-content h1::before,
+.article-content h2::before,
+.article-content h3::before,
+.article-content h4::before,
+.article-content h5::before,
+.article-content h6::before {
     content: '';
     display: block;
-    height: calc(135px / var(--zoom-rate));
-    margin-top: calc(-135px / var(--zoom-rate));
+    height: calc(144px / var(--zoom-rate));
+    margin-top: calc(-144px / var(--zoom-rate));
     visibility: hidden;
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1200px) {
     .article-list {
-        width: 55%;
+        width: 60%;
+        max-width: 960px;
+    }
+
+    #toc {
+        width: 264px;
     }
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1200px) {
+    .article-list {
+        width: 60%;
+        min-width: 560px;
+
+    }
+
+    .article-header .breadcrumb-link,
+    .article-header .breadcrumb-separator {
+        font-size: 18px;
+    }
+
+    .article-header .article-title .breadcrumb-link {
+        font-size: 22px;
+    }
+
+    #toc {
+        margin-right: 24px;
+        width: 240px;
+    }
+}
+
+@media screen and (max-width: 900px) {
     .article-list {
         width: 60%;
     }
 
+
+    .article-header .breadcrumb-link,
+    .article-header .breadcrumb-separator {
+        font-size: 14px;
+    }
+
+    .article-header .article-title .breadcrumb-link {
+        font-size: 18px;
+    }
+
+    .article-header .last-modify-date {
+        visibility: hidden;
+    }
+
     #toc {
         width: 20%;
-        margin-right: 20px;
+        min-width: 200px;
+        margin-right: 12px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .article-list {
+        width: 80%;
+    }
+
+    .article-header .breadcrumb-link,
+    .article-header .breadcrumb-separator {
+        font-size: 14px;
+    }
+
+    .article-header .article-title .breadcrumb-link {
+        font-size: 18px;
+    }
+
+    .article-header .last-modify-date {
+        visibility: hidden;
+    }
+
+    #toc {
+        display: none;
     }
 }

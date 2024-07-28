@@ -8,7 +8,9 @@
 
     <link rel="stylesheet" href="./assets/index.css" />
     <link rel="stylesheet" href="./assets/markdown.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.1/cdn.min.js" integrity="sha512-ytM6hP1K9BkRTjUQZpxZKFjJ2TvE4QXaK7phVymsm7NimaI5H09TWWW6f2JMbonLp4ftYU6xfwQGoe3C8jta9A==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.1/cdn.min.js"
+        integrity="sha512-ytM6hP1K9BkRTjUQZpxZKFjJ2TvE4QXaK7phVymsm7NimaI5H09TWWW6f2JMbonLp4ftYU6xfwQGoe3C8jta9A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css" />
     <script nomodule defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.js"
         integrity="sha384-z9arB7KJHppq8kK9AESncXcQd/KXIMMPiCrAdxfFpp+5QU438lgBE7UFGbk+gljP"
@@ -151,6 +153,11 @@
 
             //create node
             let tocEl = document.getElementById('toc');
+            console.log("offset-width:", tocEl.offsetWidth);
+            if (tocEl.offsetWidth == 0) {
+                return null;
+            }
+
             tocEl.style.visibility = 'visible';
             let level_map = { 'H1': 1, 'H2': 2, 'H3': 3, 'H4': 4, 'H5': 5, 'H6': 6 };
             let parent_node = tocEl;
@@ -189,7 +196,7 @@
         function hideToc(toc_root_el) {
             let tocEl = document.getElementById('toc');
             tocEl.removeChild(toc_root_el);
-            if (!tocEl.hasChildNodes()) {
+            if (tocEl.childElementCount == 0) {
                 tocEl.style.visibility = 'hidden';
                 tocEl.innerHTML = '';
 

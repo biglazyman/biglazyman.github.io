@@ -7,6 +7,11 @@ body {
     margin: 0;
     padding: 0;
     font-family: "LXGW WenKai", "Intel", sans-serif;
+    box-sizing: content-box;
+}
+
+body {
+    overflow-y: scroll;
 }
 
 header {
@@ -50,6 +55,7 @@ main {
     align-items: stretch;
     border: 1px solid #000;
     border-top: none;
+    border-bottom: none;
     border-radius: 0;
     margin-bottom: 16px;
     background-color: #fff;
@@ -66,7 +72,7 @@ main {
     height: 32px;
     line-height: 32px;
     padding: 12px;
-    border-top: 2px solid #000;
+    border-top: 1px solid #000;
     border-bottom: 1px solid #000;
     font-style: italic;
     background-color: #fff;
@@ -83,7 +89,7 @@ main {
 .article-header .article-title .breadcrumb-link {
     font-size: 24px;
     font-weight: 900;
-    color: #0066cc;
+    color: #0040ff;
     font-style: normal;
 }
 
@@ -104,6 +110,7 @@ main {
 
 .article-main {
     position: relative;
+    border-bottom: 1px solid #000;
 }
 
 .article-content {
@@ -115,7 +122,7 @@ main {
 #toc {
     position: sticky;
     top: 80px;
-    border: 2px groove #000;
+    border: 2px solid #000;
     align-items: flex-start;
     width: 264px;
     order: -1;
@@ -125,20 +132,23 @@ main {
     max-height: 720px;
     overflow: overlay;
     padding: 8px;
+    box-shadow: 4px 4px 0px 0 rgba(0, 0, 0, 0.2);
     visibility: hidden;
 }
 
 #toc ul {
     margin-top: 4px;
-    margin-left: -20px;
+    margin-left: -16px;
 }
 
 #toc li {
     margin-top: 12px;
+
 }
 
 #toc a {
     font-size: 16px;
+    color: #0040ff;
 }
 
 .article-content h1::before,

@@ -82,8 +82,9 @@ main {
 
 .article-header .article-title .breadcrumb-link {
     font-size: 24px;
-    font-weight: 600;
-    color: blue;
+    font-weight: 900;
+    color: #ff00a7;
+    font-style: normal;
 }
 
 .article-header .last-modify-date {

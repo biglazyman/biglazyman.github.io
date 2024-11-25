@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <title>BigLazyMan's Blog</title>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer" />
+    <meta name="google-site-verification" content="uriZPT1cv3nRq8bjTF9BpERq5TkCxcVmJMk2MgSgyac" />
+    <link rel="stylesheet" href="./assets/index.css" />
+    <link rel="stylesheet" href="./assets/markdown.css" />
+    <script src="./assets/alpinejs3.14.1.js" defer></script>
+    <script nomodule defer src="./assets/katex.js"></script>
+    <link rel="stylesheet" href="./assets/katex.css">
+</head>
+
+<body>
+    <header>BigLazyMan's Blog</header>
+    <main>
+        <div class="article-list" x-data="{ article_list: [] }"
+            x-init="article_list = await (await fetch('./directory_info.json')).json()">
+            <template x-for="(article_item,index) in article_list">
+                <div class="article-item">
+                    <nav class="article-header" x-data="{ menu: article_item.filepath.replace('./','').split('/')}">
+                        <template x-for="(menu_item,menu_index) in menu.slice(0,menu.length-1)">
+                            <span class="breadcrumb">
+                                <span class="breadcrumb-separator">/</span>
+                                <a class="breadcrumb-link" :href="menu.slice(0,menu_index+1).join('/')"
+                                    x-text="menu_item"></a>
+                            </span>
+                        </template>
+                        <span class="article-title">
+                            <span class="breadcrumb-separator">/</span>
+                            <a class="breadcrumb-link" href="javascript:void(0);" @click="toggleRead($data,index)"
+                                x-text="menu[menu.length-1]+(article_item.show?'  (Close)':'  (Read)')"></a>
+                        </span>
+                        <span class="last-modify-date" x-text="'Last Modify: ' + article_item.last_modified"></span>
+                    </nav>
+                    <template x-if="article_item.show">
+                        <div class="article-main">
+                            <div class="article-content" x-html="(async function(){
+                                const result = marked.parse(await (await fetch(article_item.filepath)).text());
+                                $nextTick(()=>{
+                                    article_item.toc_root_el = showToc(index);
+                                })
+                                return result;
+                            })()">
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <div id="toc"></div>
+    </main>
+    <script type="module">
+        import { marked } from "./assets/marked.esm.js";
+        import katex from './assets/katex.mjs';
+
+        window.marked = marked;
+
+        // support for katex
+        const marked_katex_inline = {
+            name: 'marked-katex-inline',
+            level: 'inline',
+            start(src) {
+                return src.match(/\$|\\\(/)?.index;
+            },
+            tokenizer(src, tokens) {
+                const rule = /^(?:\$|\\\()(.*?)(?:\$|\\\))/gs;
+                // const rule = /\\\((.*?)\\\)|\$(.*?)\$/;
+                const match = rule.exec(src);
+                if (match) {
+                    return {
+                        type: 'marked-katex-inline',
+                        raw: match[0],
+                        text: match[1].trim()
+                    };
+                }
+            },
+            renderer(token) {
+                return katex.renderToString(token.text, {
+                    throwOnError: false,
+                    displayMode: false
+                });;
+            }
+        }
+
+        const marked_katex_block = {
+            name: 'marked-katex-block',
+            level: 'block',
+            start(src) {
+                return src.match(/\$\$|\\\[/)?.index;
+            },
+            tokenizer(src, tokens) {
+                const rule = /^(?:\$\$|\\\[)(.*?)(?:\$\$|\\\])/gs;
+                // const rule = /\\\[(.*?)\\\]|\$\$(.*?)\$\$/;
+                const match = rule.exec(src);
+                if (match) {
+                    return {
+                        type: 'marked-katex-block',
+                        raw: match[0],
+                        text: match[1].trim()
+                    };
+                }
+            },
+            renderer(token) {
+                return katex.renderToString(token.text, {
+                    throwOnError: false,
+                    displayMode: true
+                });;
+            }
+        }
+
+        window.marked.use({
+            extensions: [
+                marked_katex_inline,
+                marked_katex_block
+            ]
+        })
+    </script>
+    <script type="text/javascript">
+        function toggleRead({ article_list }, index) {
+            if (article_list[index].show) {
+                article_list[index].show = false;
+                hideToc(article_list[index].toc_root_el);
+            } else {
+                article_list[index].show = true;
+            }
+        }
+
+        function showToc(focus_index) {
+            let selector = `.article-item:nth-of-type(${focus_index + 1}) .article-content `;
+            let header_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+            //collect all headers
+            let header_list = [];
+            for (let header_tag of header_tags) {
+                let tag_nodes = document.querySelectorAll(selector + header_tag);
+                header_list.push(...tag_nodes);
+            }
+
+            //sort
+            header_list.sort((first, next) => {
+                return first.offsetTop - next.offsetTop;
+            })
+
+            //create node
+            let tocEl = document.getElementById('toc');
+            if (tocEl.offsetWidth == 0) {
+                return null;
+            }
+
+            tocEl.style.visibility = 'visible';
+            let level_map = { 'H1': 1, 'H2': 2, 'H3': 3, 'H4': 4, 'H5': 5, 'H6': 6 };
+            let parent_node = tocEl;
+            let current_level = 0;
+            let toc_root_el = null;
+            for (let i = 0; i < header_list.length; i++) {
+                let header = header_list[i];
+                let header_level = level_map[header.tagName];
+                if (current_level < header_level) {
+                    let _ul = document.createElement('ul');
+                    parent_node.appendChild(_ul);
+                    current_level = header_level;
+                    parent_node = _ul;
+                    //save the root element
+                    if (i == 0) {
+                        toc_root_el = _ul;
+                    }
+                } else if (current_level > header_level) {
+                    current_level = header_level;
+                    parent_node = parent_node.parentNode;
+                }
+
+                let anchor_id = current_level + '-' + header.innerText;
+                header.setAttribute('id', anchor_id);
+                let _li = document.createElement('li');
+                let _a = document.createElement('a');
+                _a.setAttribute('href', '#' + anchor_id);
+                _a.innerText = header.innerText;
+                _li.appendChild(_a);
+                parent_node.appendChild(_li);
+            }
+
+            return toc_root_el;
+        }
+
+        function hideToc(toc_root_el) {
+            let tocEl = document.getElementById('toc');
+            tocEl.removeChild(toc_root_el);
+            if (tocEl.childElementCount == 0) {
+                tocEl.style.visibility = 'hidden';
+                tocEl.innerHTML = '';
+
+                //remove hash
+                location.hash = '';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+ /* Basic tab styling */
+.tab-content {
+    @apply hidden h-full w-full p-0 border border-black;
+}
+
+.tab-content.active {
+    @apply block;
+}
+
+/* Style for active tab link */
+.active-tab {
+    @apply text-red-600;
+}

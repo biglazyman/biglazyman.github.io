@@ -2,11 +2,16 @@
     --zoom-rate: 1.2;
 }
 
+@font-face {
+    font-family: "LXGW WenKai";
+    src: url('./LXGWWenKai-Regular.ttf') format('ttf');
+}
+
 html,
 body {
     margin: 0;
     padding: 0;
-    font-family: "LXGW WenKai", "Intel", sans-serif;
+    font-family: "LXGW WenKai", "KaiTi", sans-serif;
     box-sizing: content-box;
 }
 

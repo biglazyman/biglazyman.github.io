@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="./assets/index.css" />
     <link rel="stylesheet" href="./assets/markdown.css" />
     <script src="./assets/alpinejs3.14.1.js" defer></script>
-    <script nomodule defer src="./assets/katex.js"></script>
-    <link rel="stylesheet" href="./assets/katex.css">
+    <script src="./assets/marked15.0.7.js" defer></script>
+    
 </head>
 
 <body>
@@ -53,72 +53,6 @@
 
         <div id="toc"></div>
     </main>
-    <script type="module">
-        import { marked } from "./assets/marked.esm.js";
-        import katex from './assets/katex.mjs';
-
-        window.marked = marked;
-
-        // support for katex
-        const marked_katex_inline = {
-            name: 'marked-katex-inline',
-            level: 'inline',
-            start(src) {
-                return src.match(/\$|\\\(/)?.index;
-            },
-            tokenizer(src, tokens) {
-                const rule = /^(?:\$|\\\()(.*?)(?:\$|\\\))/gs;
-                // const rule = /\\\((.*?)\\\)|\$(.*?)\$/;
-                const match = rule.exec(src);
-                if (match) {
-                    return {
-                        type: 'marked-katex-inline',
-                        raw: match[0],
-                        text: match[1].trim()
-                    };
-                }
-            },
-            renderer(token) {
-                return katex.renderToString(token.text, {
-                    throwOnError: false,
-                    displayMode: false
-                });;
-            }
-        }
-
-        const marked_katex_block = {
-            name: 'marked-katex-block',
-            level: 'block',
-            start(src) {
-                return src.match(/\$\$|\\\[/)?.index;
-            },
-            tokenizer(src, tokens) {
-                const rule = /^(?:\$\$|\\\[)(.*?)(?:\$\$|\\\])/gs;
-                // const rule = /\\\[(.*?)\\\]|\$\$(.*?)\$\$/;
-                const match = rule.exec(src);
-                if (match) {
-                    return {
-                        type: 'marked-katex-block',
-                        raw: match[0],
-                        text: match[1].trim()
-                    };
-                }
-            },
-            renderer(token) {
-                return katex.renderToString(token.text, {
-                    throwOnError: false,
-                    displayMode: true
-                });;
-            }
-        }
-
-        window.marked.use({
-            extensions: [
-                marked_katex_inline,
-                marked_katex_block
-            ]
-        })
-    </script>
     <script type="text/javascript">
         function toggleRead({ article_list }, index) {
             if (article_list[index].show) {

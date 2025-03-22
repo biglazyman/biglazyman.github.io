@@ -65,16 +65,15 @@ jobs:
           script: |
             echo "🔄 Starting server deployment..."
             cd /var/www/blog
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/main
+            echo "🔄 Running traverse_directory.sh..."
             chmod -R 755 /var/www/blog
             chmod +x ./traverse_directory.sh
             sh ./traverse_directory.sh
-            echo "✅ Server deployment completed!"
-      - name: Set TimeZone 
-        uses: szenius/set-timezone@v1.2
-        with:
-          timezoneLinux: "Asia/Singapore"
-          timezoneMacos: "Asia/Singapore"
-          timezoneWindows: "Singapore Standard Time"
-      - name: restore timestamps
-        uses: harshmandan/git-restore-mtime-action@v10
+            echo "⏳ Restoring file timestamps..."
+            git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --format="%ai {}" {} \
+              |while read -r datetime file; do
+                touch -d "$datetime" "$file"
+              done
+            echo "✅ Deployment completed!"

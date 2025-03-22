@@ -1,29 +1,23 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# 整合后的完整 .github/workflows/deploy.yml 文件
+name: Deploy to GitHub Pages and Server
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
-jobs:     
-  # deploy
-  deploy:
+jobs:
+  # 原有部署到 GitHub Pages 的任务
+  deploy-to-pages:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -39,21 +33,48 @@ jobs:
           timezoneLinux: "Asia/Singapore"
           timezoneMacos: "Asia/Singapore"
           timezoneWindows: "Singapore Standard Time"
-      # Fix timestamps
       - name: restore timestamps
         uses: harshmandan/git-restore-mtime-action@v10
       - name: Build result json
         run: |
-         chmod +x ./traverse_directory.sh
-         ./traverse_directory.sh
+          chmod +x ./traverse_directory.sh
+          ./traverse_directory.sh
         shell: bash
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # 新增部署到服务器的任务（并行执行）
+  deploy-to-server:
+    runs-on: ubuntu-latest
+    environment:
+      name: nextBday
+    steps:
+      - name: SSH and Pull Code
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "🔄 Starting server deployment..."
+            cd /var/www/blog
+            git pull origin main
+            chmod -R 755 /var/www/blog
+            chmod +x ./traverse_directory.sh
+            sh ./traverse_directory.sh
+            echo "✅ Server deployment completed!"
+      - name: Set TimeZone 
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "Asia/Singapore"
+          timezoneMacos: "Asia/Singapore"
+          timezoneWindows: "Singapore Standard Time"
+      - name: restore timestamps
+        uses: harshmandan/git-restore-mtime-action@v10
